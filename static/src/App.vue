@@ -1,65 +1,70 @@
 <template>
-  <div id="app">
-    <img src="http://vuejs.org/images/logo.png">
-    <h1>{{ msg }}</h1>
-    <h2>Essential Links</h2>
-    <ul>
-      <li><a href="https://vuejs.org" target="_blank">Core Docs</a></li>
-      <li><a href="https://forum.vuejs.org" target="_blank">Forum</a></li>
-      <li><a href="https://gitter.im/vuejs/vue" target="_blank">Gitter Chat</a></li>
-      <li><a href="https://twitter.com/vuejs" target="_blank">Twitter</a></li>
-    </ul>
-    <h2>Ecosystem</h2>
-    <ul>
-      <li><a href="http://router.vuejs.org/" target="_blank">vue-router</a></li>
-      <li><a href="http://vuex.vuejs.org/" target="_blank">vuex</a></li>
-      <li><a href="https://github.com/vuejs/vueify" target="_blank">vueify</a></li>
-      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank">awesome-vue</a></li>
-    </ul>
-  </div>
+    <v-app :dark="nightmode">
+        <v-navigation-drawer
+                fixed
+                clipped
+                v-model="drawer"
+                app
+        >
+            <v-list dense>
+                <v-list-tile
+                        v-for="(item, i) in items"
+                        :key="i"
+                        :to="item.url"
+                        ripple
+                >
+                    <v-list-tile-action style="margin-right: -16px">
+                        <font-awesome-icon :icon="item.icon" fixed-width size="lg"
+                                           style="opacity: .7;"></font-awesome-icon>
+                    </v-list-tile-action>
+                    <v-list-tile-content>
+                        <v-list-tile-title v-text="item.title"></v-list-tile-title>
+                    </v-list-tile-content>
+                </v-list-tile>
+            </v-list>
+        </v-navigation-drawer>
+        <v-toolbar fixed app clipped-left>
+            <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
+            <v-toolbar-title v-text="title"></v-toolbar-title>
+            <v-spacer></v-spacer>
+            <login></login>
+            <v-btn icon @click.stop="nightmode = !nightmode">
+                <font-awesome-icon icon="moon"></font-awesome-icon>
+            </v-btn>
+        </v-toolbar>
+        <v-content>
+            <v-container fluid>
+                <v-slide-y-transition mode="out-in">
+                    <router-view></router-view>
+                </v-slide-y-transition>
+            </v-container>
+        </v-content>
+        <v-footer :fixed="false" app>
+            <span>&copy; 2017</span>
+        </v-footer>
+    </v-app>
 </template>
 
 <script>
-export default {
-  name: 'app',
-  data () {
-    return {
-      msg: 'Welcome to Your Vue.js App'
+    import Login from "./Login";
+
+    export default {
+        components: {Login},
+        data() {
+            return {
+                drawer: true,
+                nightmode: false,
+                items: [
+                    {icon: 'play', title: 'Play', url: '/play'},
+                    {icon: 'trophy', title: 'Leaderboards', url: '/leaderboards'},
+                    {icon: 'home', title: 'Profile', url: '/profile'},
+                ],
+                title: 'Phoenix League',
+            }
+        },
     }
-  }
-}
 </script>
 
 <style scoped>
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
 
-img {
-  width: 200px;
-  height: 200px;
-}
-
-h1, h2 {
-  font-weight: normal;
-}
-
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-
-a {
-  color: #42b983;
-}
 </style>
