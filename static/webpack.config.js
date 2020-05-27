@@ -70,6 +70,11 @@ module.exports = {
             target: "http://localhost:8081",
             secure: false,
         }, {
+            context: ["/api/socket"],
+            target: "ws://localhost:8081",
+            secure: false,
+            ws: true,
+        }, {
             context: ["/signin"],
             target: "http://localhost:8081",
             secure: false,

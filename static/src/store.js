@@ -10,6 +10,9 @@ export default new Vuex.Store({
     },
     mutations: {
         SOCKET_ONOPEN() {
+        },
+
+        SOCKET_ONCLOSE() {
 
         },
 

@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"net/http"
 	"smaug/phoenix-league/go-server/log"
-	"time"
 
 	"github.com/gorilla/websocket"
+	"github.com/sanity-io/litter"
 )
 
 var upgrader = websocket.Upgrader{
@@ -32,20 +32,47 @@ type msg struct {
 	Mutation string `json:"mutation"`
 }
 
-func (*WebSocket) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+type request struct {
+	Kind string `json:"kind"`
+}
+
+func (s *WebSocket) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Error(err)
 		return
 	}
 
+	defer conn.Close()
+
+	var uid int
+	c, err := r.Cookie("session")
+	if err != http.ErrNoCookie {
+		if err != nil {
+			log.Error(err)
+			return
+		}
+		row := s.db.QueryRow("SELECT user_id FROM users WHERE session_id=$1", c.Value)
+		if err := row.Scan(&uid); err != nil {
+			log.Error(err)
+			return
+		}
+		conn.WriteJSON(msg{Mutation: "login"})
+	} else {
+		fmt.Println("Couldn't find the cookie :(")
+	}
+
 	fmt.Println("We got a connection!")
 
-	//w.Write([]byte(`{"mutation":"login"}`))
+	for {
+		var req request
+		if err := conn.ReadJSON(&req); err != nil {
+			if !websocket.IsCloseError(err, websocket.CloseGoingAway) {
+				log.Error(err)
+			}
+			break
+		}
 
-	time.AfterFunc(time.Second*10, func() {
-		conn.WriteJSON(msg{Mutation: "login"})
-	})
-
-	_ = conn
+		litter.Dump(req)
+	}
 }

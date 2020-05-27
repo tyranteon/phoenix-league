@@ -1,0 +1,4 @@
+{
+  "ext": "js,json,ts",
+  "exec": "ts-node src/main.ts"
+}
